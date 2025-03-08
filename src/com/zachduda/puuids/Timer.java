@@ -3,6 +3,7 @@ package com.zachduda.puuids;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -31,6 +32,7 @@ public class Timer {
     private static int taskid = 1;
     //                                 UUID   PLUGIN   PATH     DATA    ID
     private static final ArrayList<Quartet<String, String, String, Object, Integer>> rawdata = new ArrayList<>();
+    private static final ArrayList<CompletableFuture<Integer>> futures = new ArrayList<>();
     final static BukkitTask timer = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
         final int size = getQSize();
         final int ssize = updateSystem.size();
@@ -138,7 +140,7 @@ public class Timer {
 
             try {
                 setcache.save(f);
-                TimerSaved tse = new TimerSaved(plname, uuid, taskid);
+                TimerSaved tse = new TimerSaved(plname, uuid, taskid, futures.get(taskid));
                 Bukkit.getServer().getPluginManager().callEvent(tse);
             } catch (Exception err) {
                 busy = false;
@@ -166,14 +168,16 @@ public class Timer {
         return rawdata.size();
     }
 
-    static int queueSet(String pl, String uuid, String location, Object value) {
+    static CompletableFuture<Integer> queueSet(String pl, String uuid, String location, Object value) {
         final int thisid = taskid;
         taskid += 1;
+        CompletableFuture<Integer> future = new CompletableFuture<>();
+        futures.add(thisid, future);
         Bukkit.getScheduler().runTask(plugin, () -> { // Ensures running SYNC to place.
             Quartet<String, String, String, Object, Integer> quart = new Quartet<String, String, String, Object, Integer>(uuid, pl.toUpperCase(), location, value, thisid);
             rawdata.add(quart);
         });
-        return thisid;
+        return future;
     }
 
     static void stopTimer() {

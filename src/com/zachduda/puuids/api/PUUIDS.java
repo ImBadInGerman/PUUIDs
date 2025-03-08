@@ -2,6 +2,7 @@ package com.zachduda.puuids.api;
 
 import com.google.common.io.Files;
 import com.zachduda.puuids.Main;
+import com.zachduda.puuids.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unused")
 public class PUUIDS {
@@ -332,9 +334,9 @@ public class PUUIDS {
         return allplayers;
     }
 
-    public static int setLocation(Plugin pl, String uuid, String location, Location input) {
+    public static CompletableFuture<Integer> setLocation(Plugin pl, String uuid, String location, Location input) {
         if (pl == null || uuid == null || location == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
 
         plugin.set(pl, uuid, location + ".X", input.getX());
@@ -467,9 +469,9 @@ public class PUUIDS {
      * @param location Where under the player file to save as? (Similar to Configuration save paths)
      * @return The UUID of a player as a String
      */
-    public static int setNull(Plugin pl, String uuid, String location) {
+    public static CompletableFuture<Integer> setNull(Plugin pl, String uuid, String location) {
         if (pl == null || uuid == null || location == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
 
         return plugin.set(pl, uuid, location, null);
@@ -485,9 +487,9 @@ public class PUUIDS {
      * @param uuid The UUID of the player as a String.
      * @return The UUID of a player as a String
      */
-    public static int setNull(Plugin pl, String uuid) {
+    public static CompletableFuture<Integer> setNull(Plugin pl, String uuid) {
         if (pl == null || uuid == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
 
         return plugin.set(pl, uuid, null);
@@ -502,9 +504,9 @@ public class PUUIDS {
      * @param add      The string you want to add and save to that player file.
      * @return A boolean of weather or not the operation was successful.
      */
-    public static int addToStringList(Plugin pl, String uuid, String location, String add) {
+    public static CompletableFuture<Integer> addToStringList(Plugin pl, String uuid, String location, String add) {
         if (pl == null || uuid == null || location == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
 
         List<String> input = getStringList(pl, uuid, location);
@@ -524,9 +526,9 @@ public class PUUIDS {
      * @param add      The int you want to add and save to that player file.
      * @return A boolean of weather or not the operation was successful.
      */
-    public static int addToIntList(Plugin pl, String uuid, String location, int add) {
+    public static CompletableFuture<Integer> addToIntList(Plugin pl, String uuid, String location, int add) {
         if (pl == null || uuid == null || location == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
         List<Integer> input = getIntList(pl, uuid, location);
         input.add(add);
@@ -545,9 +547,9 @@ public class PUUIDS {
      * @param add      The string you want to remove and save to that player file.
      * @return A boolean of weather or not the operation was successful.
      */
-    public static int removeFromStringList(Plugin pl, String uuid, String location, String add) {
+    public static CompletableFuture<Integer> removeFromStringList(Plugin pl, String uuid, String location, String add) {
         if (pl == null || uuid == null || location == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
         List<String> input = getStringList(pl, uuid, location);
         input.remove(add);
@@ -567,9 +569,9 @@ public class PUUIDS {
      * @param add      The int you want to remove and save to that player file.
      * @return A boolean of weather or not the operation was successful.
      */
-    public static int removeFromIntList(Plugin pl, String uuid, String location, int add) {
+    public static CompletableFuture<Integer> removeFromIntList(Plugin pl, String uuid, String location, int add) {
         if (pl == null || uuid == null || location == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
 
         List<Integer> input = getIntList(pl, uuid, location);
@@ -589,12 +591,12 @@ public class PUUIDS {
      * @param input    Accepts a boolean/int/long or other value to set.
      * @return The UUID of a player as a String
      */
-    public static int set(Plugin pl, String uuid, String location, Object input) {
+    public static CompletableFuture<Integer> set(Plugin pl, String uuid, String location, Object input) {
         if (pl == null || uuid == null || location == null) {
-            return 0;
+            return CompletableFuture.completedFuture(0);
         }
 
-        return plugin.set(pl, uuid, location, input);
+        return Timer.queueSet(pl.getName().toUpperCase(), uuid, location, input);
     }
     // End of List Remove
 
