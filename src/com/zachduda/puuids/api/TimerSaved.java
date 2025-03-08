@@ -3,6 +3,8 @@ package com.zachduda.puuids.api;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import java.util.concurrent.CompletableFuture;
+
 public class TimerSaved extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -10,12 +12,14 @@ public class TimerSaved extends Event {
     private final String plname;
     private final String uuid;
     private final int taskid;
+    private final CompletableFuture<Integer> future;
 
-    public TimerSaved(String plname, String uuid, int taskid) {
+    public TimerSaved(String plname, String uuid, int taskid, CompletableFuture<Integer> future) {
         super(true);
         this.plname = plname;
         this.taskid = taskid;
         this.uuid = uuid;
+        this.future = future;
     }
 
     public static HandlerList getHandlerList() {
@@ -38,4 +42,7 @@ public class TimerSaved extends Event {
         return this.uuid;
     }
 
+    public CompletableFuture<Integer> getFuture() {
+        return this.future;
+    }
 }
